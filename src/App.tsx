@@ -9,16 +9,22 @@ interface Pokemons {
   url: string
 }
 
-
-
+export interface Detail {
+  id: number;
+  isOpened: boolean
+}
 
 const App:React.FC = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [nextUrl, setNextUrl] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true)
+  const [viewDetail, setDetail] = useState<Detail>({
+    id: 0,
+    isOpened: false
+  })
   useEffect(() => {
     const getPokemon = async() => {
-      const res = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=50&offset=50')
+      const res = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=10&offset=10')
       setNextUrl(res.data.next)
       res.data.results.forEach(async(pokemon:Pokemons) => {
         const poke = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
@@ -46,10 +52,12 @@ const App:React.FC = () => {
         <header className="pokemon-header">
           Pokemon
         </header>
-        <PokemonCollection pokemons={pokemons} />
-        <div className="btn">
-          <button onClick={nextPage}> {loading ? "Loading ..." : "Load More"} </button>
-        </div>
+        <PokemonCollection pokemons={pokemons} viewDetail={viewDetail} setDetail={setDetail} />
+        {!viewDetail.isOpened && (
+          <div className="btn">
+            <button onClick={nextPage}> {loading ? "Loading ..." : "Load More"} </button>
+          </div>
+        )}
       </div>
     </div>
   )
